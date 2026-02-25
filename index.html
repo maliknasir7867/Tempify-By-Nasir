@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tempify - Secure Temporary Email Service</title>
+    <style>
+        /* Base Styles & CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-bg: #0f172a;
+            --darker-bg: #020617;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+            --success-bg: #064e3b;
+            --success-text: #d1fae5;
+            --error-bg: #7f1d1d;
+            --error-text: #fee2e2;
+            --info-bg: #1e3a8a;
+            --info-text: #dbeafe;
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --gradient-2: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--darker-bg);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Container & Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header Styles */
+        .header {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-xl);
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            transform: rotate(10deg);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            transform: rotate(0deg) scale(1.1);
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Main Content Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Email Display Section */
+        .email-display {
+            background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .email-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 70%
+            );
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        .email-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .email-address {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 15px;
+            word-break: break-all;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .email-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        .btn-success {
+            background: var(--gradient-2);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Session Info */
+        .session-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            word-break: break-all;
+        }
+
+        /* Inbox Styles */
+        .inbox-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .inbox-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box i {
+            color: var(--text-secondary);
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Messages List */
+        .messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .message-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .message-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .message-item.unread {
+            border-left: 4px solid var(--primary-color);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .message-from {
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .message-from i {
+            color: var(--primary-color);
+        }
+
+        .message-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .message-subject {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .message-preview {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .message-tags {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-color);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Message Detail Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 24px 24px 0 0;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .message-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .detail-header {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-label {
+            width: 100px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: white;
+            word-break: break-word;
+        }
+
+        .message-body {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Notifications */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            background: var(--card-bg);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            max-width: 400px;
+            animation: notificationSlide 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes notificationSlide {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            border-left-color: var(--secondary-color);
+        }
+
+        .notification.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .notification.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .notification-icon {
+            font-size: 24px;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 24px;
+            z-index: 10;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .footer-section h4 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        .copyright {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-stats {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .email-address {
+                font-size: 20px;
+            }
+
+            .session-info {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+        }
+
+        /* Utility Classes */
+        .text-primary { color: var(--primary-color); }
+        .text-secondary { color: var(--secondary-color); }
+        .text-danger { color: var(--danger-color); }
+        .text-warning { color: var(--warning-color); }
+        
+        .bg-primary { background: var(--primary-color); }
+        .bg-secondary { background: var(--secondary-color); }
+        .bg-danger { background: var(--danger-color); }
+        .bg-warning { background: var(--warning-color); }
+
+        .mt-1 { margin-top: 5px; }
+        .mt-2 { margin-top: 10px; }
+        .mt-3 { margin-top: 15px; }
+        .mt-4 { margin-top: 20px; }
+        .mt-5 { margin-top: 25px; }
+
+        .mb-1 { margin-bottom: 5px; }
+        .mb-2 { margin-bottom: 10px; }
+        .mb-3 { margin-bottom: 15px; }
+        .mb-4 { margin-bottom: 20px; }
+        .mb-5 { margin-bottom: 25px; }
+
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+
+        .d-flex { display: flex; }
+        .align-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-1 { gap: 5px; }
+        .gap-2 { gap: 10px; }
+        .gap-3 { gap: 15px; }
+        .gap-4 { gap: 20px; }
+
+        .w-100 { width: 100%; }
+        .h-100 { height: 100%; }
+
+        /* Animations */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+            }
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--darker-bg);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon float">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Tempify</h1>
+                    <p>Secure • Anonymous • Temporary Email</p>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalEmails">0</div>
+                    <div class="stat-label">Emails Created</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="activeSessions">1</div>
+                    <div class="stat-label">Active Session</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="uptime">99.9%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Left Column - Email Management -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-inbox"></i>
+                        Email Management
+                    </h2>
+                    <span class="badge pulse">Active</span>
+                </div>
+                
+                <!-- Email Display Section -->
+                <div class="email-display" id="emailDisplay">
+                    <div class="email-label">Your Temporary Email</div>
+                    <div class="email-address" id="emailAddress">Click Generate to create</div>
+                    <div class="email-actions">
+                        <button class="btn btn-primary" onclick="generateNewEmail()" id="generateBtn">
+                            <i class="fas fa-plus-circle"></i>
+                            Generate New Email
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyEmail()" id="copyBtn" disabled>
+                            <i class="fas fa-copy"></i>
+                            Copy Email
+                        </button>
+                        <button class="btn btn-secondary" onclick="refreshInbox()" id="refreshBtn" disabled>
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Inbox
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Session Information -->
+                <div class="session-info" id="sessionInfo" style="display: none;">
+                    <div class="info-item">
+                        <div class="info-label">Session ID</div>
+                        <div class="info-value" id="sessionId">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Expires At</div>
+                        <div class="info-value" id="expiresAt">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Time Remaining</div>
+                        <div class="info-value" id="timeRemaining">-</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div style="margin-top: 20px;">
+                    <h3 style="color: var(--text-secondary); margin-bottom: 15px; font-size: 16px;">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="openNewTab()">
+                            <i class="fas fa-external-link-alt"></i> Open in New Tab
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportInbox()" id="exportBtn" disabled>
+                            <i class="fas fa-download"></i> Export Inbox
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearInbox()" id="clearBtn" disabled>
+                            <i class="fas fa-trash-alt"></i> Clear Inbox
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                            <i class="fas fa-clock"></i> Auto Refresh: OFF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div style="margin-top: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 15px;">
+                    <h3 style="color: var(--text-secondary); margin-bottom: 10px; font-size: 16px;">
+                        <i class="fas fa-chart-bar"></i> Statistics
+                    </h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Messages Received</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--primary-color);" id="messageCount">0</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Storage Used</div>
+                            <div style="font-size: 24px; font-weight: 700; color: var(--secondary-color);" id="storageUsed">0 KB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Inbox -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-envelope"></i>
+                        Inbox
+                    </h2>
+                    <span class="badge" id="inboxCount">0 messages</span>
+                </div>
+
+                <!-- Inbox Controls -->
+                <div class="inbox-header">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search messages..." id="searchInput" onkeyup="filterMessages()">
+                    </div>
+                    <div class="inbox-controls">
+                        <button class="btn btn-secondary" onclick="markAllAsRead()" id="markReadBtn" disabled>
+                            <i class="fas fa-check-double"></i>
+                        </button>
+                        <button class="btn btn-secondary" onclick="deleteAllMessages()" id="deleteAllBtn" disabled>
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Messages List -->
+                <div class="messages-list" id="messagesList">
+                    <div class="empty-state">
+                        <i class="fas fa-envelope-open"></i>
+                        <h3>No messages yet</h3>
+                        <p>Generate an email and wait for messages to appear. They will show up here automatically.</p>
+                    </div>
+                </div>
+
+                <!-- Inbox Footer -->
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-secondary); font-size: 13px;">
+                        <i class="fas fa-shield-alt"></i> End-to-end encrypted
+                    </span>
+                    <span style="color: var(--text-secondary); font-size: 13px;">
+                        Last updated: <span id="lastUpdated">Never</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-top: 25px;">
+            <div class="card" style="text-align: center;">
+                <i class="fas fa-bolt" style="font-size: 40px; color: var(--primary-color); margin-bottom: 15px;"></i>
+                <h3>Instant Creation</h3>
+                <p style="color: var(--text-secondary);">Generate a temporary email address instantly with one click</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <i class="fas fa-shield-alt" style="font-size: 40px; color: var(--primary-color); margin-bottom: 15px;"></i>
+                <h3>Privacy Focused</h3>
+                <p style="color: var(--text-secondary);">Your data is encrypted and automatically deleted after expiry</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <i class="fas fa-sync-alt" style="font-size: 40px; color: var(--primary-color); margin-bottom: 15px;"></i>
+                <h3>Real-time Updates</h3>
+                <p style="color: var(--text-secondary);">Inbox updates automatically when new messages arrive</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <i class="fas fa-globe" style="font-size: 40px; color: var(--primary-color); margin-bottom: 15px;"></i>
+                <h3>Free Forever</h3>
+                <p style="color: var(--text-secondary);">Completely free service with no hidden costs</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-section">
+                <h4><i class="fas fa-info-circle"></i> About</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> How it works</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Privacy Policy</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Terms of Service</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4><i class="fas fa-cog"></i> Features</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> API Access</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Browser Extension</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Mobile App</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Enterprise</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4><i class="fas fa-support"></i> Support</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Help Center</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Contact Us</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Status Page</a></li>
+                    <li><a href="#"><i class="fas fa-angle-right"></i> Report Bug</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4><i class="fas fa-link"></i> Connect</h4>
+                <ul>
+                    <li><a href="#"><i class="fab fa-github"></i> GitHub</a></li>
+                    <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                    <li><a href="#"><i class="fab fa-discord"></i> Discord</a></li>
+                    <li><a href="#"><i class="fab fa-telegram"></i> Telegram</a></li>
+                </ul>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2026 Developed by <a href="https://t.me/NasirTech765" target="_blank" style="color: var(--primary-color); text-decoration: none;">Nasir Hacker</a>. All rights reserved.</p>
+                <p style="margin-top: 10px; font-size: 11px;">Version 2.0.0 | Server Time: <span id="serverTime"></span></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Message Detail Modal -->
+    <div class="modal" id="messageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-envelope-open-text"></i> Message Details</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="message-detail" id="messageDetail">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- JavaScript -->
+    <script>
+        // =========================================================================
+        // Tempify - Main Application Logic (UPDATED FOR API RESPONSE)
+        // =========================================================================
+        // Version: 2.0.1
+        // Author: Nasir Hacker
+        // Description: Advanced temporary email service with real-time inbox
+        // =========================================================================
+
+        // =========================================================================
+        // Global State Management
+        // =========================================================================
+        const AppState = {
+            currentEmail: null,
+            currentSessionId: null,
+            expiresAt: null,
+            messages: [],
+            filteredMessages: [],
+            inboxCount: 0,
+            autoRefreshInterval: null,
+            isAutoRefreshEnabled: false,
+            lastUpdated: null,
+            totalEmailsGenerated: 0,
+            storageUsed: 0,
+            isLoading: false,
+            searchTerm: '',
+            unreadCount: 0,
+            messageDetail: null
+        };
+
+        // =========================================================================
+        // API Configuration
+        // =========================================================================
+        const API = {
+            BASE_URL: 'https://apis.davidcyril.name.ng',
+            TEMP_MAIL: '/temp-mail',
+            INBOX: '/temp-mail/inbox',
+            
+            async generateEmail() {
+                try {
+                    showLoading();
+                    const response = await fetch(this.BASE_URL + this.TEMP_MAIL);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+                    hideLoading();
+                    
+                    if (data.success) {
+                        return data;
+                    } else {
+                        throw new Error('API returned success: false');
+                    }
+                } catch (error) {
+                    hideLoading();
+                    showNotification('error', 'API Error', 'Failed to generate email: ' + error.message);
+                    throw error;
+                }
+            },
+
+            async fetchInbox(sessionId) {
+                try {
+                    const response = await fetch(`${this.BASE_URL}${this.INBOX}?id=${encodeURIComponent(sessionId)}`);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        return data;
+                    } else {
+                        throw new Error('API returned success: false');
+                    }
+                } catch (error) {
+                    showNotification('error', 'API Error', 'Failed to fetch inbox: ' + error.message);
+                    throw error;
+                }
+            }
+        };
+
+        // =========================================================================
+        // Notification System
+        // =========================================================================
+        function showNotification(type, title, message, duration = 5000) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.animation = 'notificationSlide 0.3s ease reverse';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, duration);
+        }
+
+        // =========================================================================
+        // Loading State Management
+        // =========================================================================
+        function showLoading(element = null) {
+            AppState.isLoading = true;
+            if (element) {
+                element.disabled = true;
+                element.innerHTML = '<span class="loading-spinner"></span> Loading...';
+            }
+        }
+
+        function hideLoading(element = null) {
+            AppState.isLoading = false;
+            if (element) {
+                element.disabled = false;
+                element.innerHTML = element.getAttribute('data-original-text') || element.innerHTML;
+            }
+        }
+
+        // =========================================================================
+        // Email Generation
+        // =========================================================================
+        async function generateNewEmail() {
+            const generateBtn = document.getElementById('generateBtn');
+            const originalText = generateBtn.innerHTML;
+            generateBtn.setAttribute('data-original-text', originalText);
+            
+            try {
+                showLoading(generateBtn);
+                
+                const data = await API.generateEmail();
+                
+                AppState.currentEmail = data.email;
+                AppState.currentSessionId = data.session_id;
+                AppState.expiresAt = data.expires_at;
+                AppState.totalEmailsGenerated++;
+                
+                updateEmailDisplay();
+                updateSessionInfo();
+                enableInboxFeatures();
+                
+                // Fetch initial inbox
+                await fetchInbox();
+                
+                showNotification('success', 'Success!', 'New email generated successfully');
+                
+                // Update total emails stat
+                document.getElementById('totalEmails').textContent = AppState.totalEmailsGenerated;
+                
+                // Start auto-refresh if enabled
+                if (AppState.isAutoRefreshEnabled) {
+                    startAutoRefresh();
+                }
+                
+            } catch (error) {
+                console.error('Error generating email:', error);
+            } finally {
+                hideLoading(generateBtn);
+            }
+        }
+
+        // =========================================================================
+        // Inbox Management - UPDATED for correct API response format
+        // =========================================================================
+        async function fetchInbox() {
+            if (!AppState.currentSessionId) {
+                showNotification('warning', 'No Session', 'Please generate an email first');
+                return;
+            }
+            
+            const refreshBtn = document.getElementById('refreshBtn');
+            const originalText = refreshBtn.innerHTML;
+            refreshBtn.setAttribute('data-original-text', originalText);
+            
+            try {
+                showLoading(refreshBtn);
+                
+                const data = await API.fetchInbox(AppState.currentSessionId);
+                
+                // Process messages from API response
+                if (data.messages && Array.isArray(data.messages)) {
+                    // Transform API message format to our internal format
+                    AppState.messages = data.messages.map(msg => ({
+                        id: generateMessageId(),
+                        from: msg.fromAddr || 'Unknown Sender',
+                        to: msg.toAddr || AppState.currentEmail,
+                        subject: msg.headerSubject || 'No Subject',
+                        body: msg.text || '',
+                        date: new Date().toISOString(), // API doesn't provide date, use current time
+                        rawSize: msg.rawSize || 0,
+                        downloadUrl: msg.downloadUrl || '',
+                        read: false,
+                        attachments: false
+                    }));
+                    
+                    AppState.inboxCount = data.inbox_count || AppState.messages.length;
+                } else {
+                    AppState.messages = [];
+                    AppState.inboxCount = 0;
+                }
+                
+                AppState.lastUpdated = new Date();
+                AppState.filteredMessages = [...AppState.messages];
+                
+                updateInboxDisplay();
+                updateStats();
+                
+                document.getElementById('lastUpdated').textContent = formatTime(AppState.lastUpdated);
+                
+                // Show notification for new messages
+                if (AppState.messages.length > 0) {
+                    showNotification('success', 'Inbox Updated', `You have ${AppState.messages.length} message(s)`);
+                }
+                
+            } catch (error) {
+                console.error('Error fetching inbox:', error);
+                showNotification('error', 'Fetch Failed', 'Could not retrieve inbox messages');
+            } finally {
+                hideLoading(refreshBtn);
+            }
+        }
+
+        // Helper function to generate a unique message ID
+        function generateMessageId() {
+            return 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // =========================================================================
+        // UI Update Functions
+        // =========================================================================
+        function updateEmailDisplay() {
+            const emailElement = document.getElementById('emailAddress');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            if (AppState.currentEmail) {
+                emailElement.textContent = AppState.currentEmail;
+                copyBtn.disabled = false;
+            } else {
+                emailElement.textContent = 'Click Generate to create';
+                copyBtn.disabled = true;
+            }
+        }
+
+        function updateSessionInfo() {
+            const sessionInfo = document.getElementById('sessionInfo');
+            const refreshBtn = document.getElementById('refreshBtn');
+            
+            if (AppState.currentSessionId) {
+                sessionInfo.style.display = 'grid';
+                document.getElementById('sessionId').textContent = AppState.currentSessionId.substring(0, 20) + '...';
+                document.getElementById('expiresAt').textContent = formatDate(AppState.expiresAt);
+                
+                // Start countdown timer
+                startExpiryCountdown();
+                
+                refreshBtn.disabled = false;
+            } else {
+                sessionInfo.style.display = 'none';
+                refreshBtn.disabled = true;
+            }
+        }
+
+        function updateInboxDisplay() {
+            const messagesList = document.getElementById('messagesList');
+            const inboxCount = document.getElementById('inboxCount');
+            const markReadBtn = document.getElementById('markReadBtn');
+            const deleteAllBtn = document.getElementById('deleteAllBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            
+            // Update filtered messages based on search
+            filterMessages();
+            
+            // Update counts
+            inboxCount.textContent = `${AppState.messages.length} message${AppState.messages.length !== 1 ? 's' : ''}`;
+            
+            // Enable/disable buttons based on message count
+            const hasMessages = AppState.messages.length > 0;
+            markReadBtn.disabled = !hasMessages;
+            deleteAllBtn.disabled = !hasMessages;
+            exportBtn.disabled = !hasMessages;
+            clearBtn.disabled = !hasMessages;
+            
+            // Update unread count
+            updateUnreadCount();
+        }
+
+        function updateUnreadCount() {
+            AppState.unreadCount = AppState.messages.filter(msg => !msg.read).length;
+        }
+
+        function updateStats() {
+            // Calculate storage used (rough estimate)
+            const totalSize = AppState.messages.reduce((acc, msg) => {
+                return acc + (msg.subject?.length || 0) + (msg.body?.length || 0) + (msg.rawSize || 0);
+            }, 0);
+            
+            AppState.storageUsed = totalSize;
+            
+            document.getElementById('messageCount').textContent = AppState.messages.length;
+            document.getElementById('storageUsed').textContent = formatBytes(totalSize);
+        }
+
+        // =========================================================================
+        // Message Filtering and Search
+        // =========================================================================
+        function filterMessages() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            AppState.searchTerm = searchTerm;
+            
+            if (!searchTerm) {
+                AppState.filteredMessages = [...AppState.messages];
+            } else {
+                AppState.filteredMessages = AppState.messages.filter(msg => 
+                    (msg.from?.toLowerCase().includes(searchTerm)) ||
+                    (msg.subject?.toLowerCase().includes(searchTerm)) ||
+                    (msg.body?.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            renderMessages();
+        }
+
+        function renderMessages() {
+            const messagesList = document.getElementById('messagesList');
+            const messages = AppState.filteredMessages;
+            
+            if (messages.length === 0) {
+                if (AppState.searchTerm) {
+                    messagesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>No matches found</h3>
+                            <p>No messages match your search term "${escapeHtml(AppState.searchTerm)}"</p>
+                        </div>
+                    `;
+                } else {
+                    messagesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-envelope-open"></i>
+                            <h3>No messages yet</h3>
+                            <p>Generate an email and wait for messages to appear. They will show up here automatically.</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            messagesList.innerHTML = messages.map((msg, index) => {
+                // Create a preview from the body text (first 100 chars)
+                const previewText = msg.body ? msg.body.substring(0, 100).replace(/\n/g, ' ') : 'No content';
+                
+                return `
+                <div class="message-item ${msg.read ? '' : 'unread'}" onclick="openMessage('${msg.id}')">
+                    <div class="message-header">
+                        <div class="message-from">
+                            <i class="fas fa-user-circle"></i>
+                            ${escapeHtml(msg.from || 'Unknown Sender')}
+                        </div>
+                        <div class="message-date">
+                            <i class="far fa-clock"></i>
+                            ${formatDate(msg.date) || 'Just now'}
+                        </div>
+                    </div>
+                    <div class="message-subject">
+                        ${escapeHtml(msg.subject || 'No Subject')}
+                    </div>
+                    <div class="message-preview">
+                        ${escapeHtml(previewText)}...
+                        <div class="message-tags">
+                            ${msg.attachments ? '<span class="tag"><i class="fas fa-paperclip"></i></span>' : ''}
+                            <span class="tag"><i class="far fa-envelope"></i></span>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // =========================================================================
+        // Message Actions - UPDATED to use message ID
+        // =========================================================================
+        function openMessage(messageId) {
+            const message = AppState.filteredMessages.find(m => m.id === messageId);
+            if (!message) return;
+            
+            const originalMessage = AppState.messages.find(m => m.id === messageId);
+            
+            // Mark as read
+            if (!message.read) {
+                message.read = true;
+                if (originalMessage) originalMessage.read = true;
+                updateUnreadCount();
+                renderMessages();
+            }
+            
+            // Set message detail
+            AppState.messageDetail = message;
+            
+            // Populate modal
+            const modalBody = document.getElementById('messageDetail');
+            
+            // Format the body text to preserve line breaks and make links clickable
+            const formattedBody = formatMessageBody(message.body || 'No content available');
+            
+            modalBody.innerHTML = `
+                <div class="detail-header">
+                    <div class="detail-row">
+                        <div class="detail-label">From:</div>
+                        <div class="detail-value">${escapeHtml(message.from || 'Unknown')}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">To:</div>
+                        <div class="detail-value">${escapeHtml(message.to || AppState.currentEmail || 'Unknown')}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Subject:</div>
+                        <div class="detail-value">${escapeHtml(message.subject || 'No Subject')}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Date:</div>
+                        <div class="detail-value">${escapeHtml(formatDate(message.date) || 'Unknown')}</div>
+                    </div>
+                </div>
+                <div class="message-body">
+                    ${formattedBody}
+                </div>
+            `;
+            
+            // Show modal
+            document.getElementById('messageModal').classList.add('active');
+        }
+
+        // Helper function to format message body with clickable links
+        function formatMessageBody(text) {
+            if (!text) return 'No content available';
+            
+            // Escape HTML first
+            let escaped = escapeHtml(text);
+            
+            // Convert URLs to clickable links
+            escaped = escaped.replace(
+                /(https?:\/\/[^\s]+)/g, 
+                '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: underline;">$1</a>'
+            );
+            
+            // Preserve line breaks
+            escaped = escaped.replace(/\n/g, '<br>');
+            
+            return escaped;
+        }
+
+        function closeModal() {
+            document.getElementById('messageModal').classList.remove('active');
+            AppState.messageDetail = null;
+        }
+
+        function markAllAsRead() {
+            AppState.messages.forEach(msg => msg.read = true);
+            AppState.filteredMessages.forEach(msg => msg.read = true);
+            updateUnreadCount();
+            renderMessages();
+            showNotification('success', 'Marked Read', 'All messages marked as read');
+        }
+
+        function deleteAllMessages() {
+            if (confirm('Are you sure you want to delete all messages? This action cannot be undone.')) {
+                AppState.messages = [];
+                AppState.filteredMessages = [];
+                AppState.inboxCount = 0;
+                updateInboxDisplay();
+                renderMessages();
+                updateStats();
+                showNotification('success', 'Deleted', 'All messages deleted successfully');
+            }
+        }
+
+        function clearInbox() {
+            deleteAllMessages();
+        }
+
+        // =========================================================================
+        // Utility Functions
+        // =========================================================================
+        function copyEmail() {
+            if (AppState.currentEmail) {
+                navigator.clipboard.writeText(AppState.currentEmail).then(() => {
+                    showNotification('success', 'Copied!', 'Email address copied to clipboard');
+                }).catch(err => {
+                    showNotification('error', 'Error', 'Failed to copy email');
+                });
+            }
+        }
+
+        function refreshInbox() {
+            fetchInbox();
+        }
+
+        function enableInboxFeatures() {
+            document.getElementById('refreshBtn').disabled = false;
+            document.getElementById('exportBtn').disabled = false;
+            document.getElementById('clearBtn').disabled = false;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleString();
+            } catch {
+                return dateString;
+            }
+        }
+
+        function formatTime(date) {
+            if (!date) return 'Never';
+            try {
+                return date.toLocaleTimeString();
+            } catch {
+                return 'Unknown';
+            }
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function startExpiryCountdown() {
+            if (!AppState.expiresAt) return;
+            
+            const updateCountdown = () => {
+                const now = new Date();
+                const expiry = new Date(AppState.expiresAt);
+                const diff = expiry - now;
+                
+                if (diff <= 0) {
+                    document.getElementById('timeRemaining').textContent = 'Expired';
+                    return;
+                }
+                
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('timeRemaining').textContent = 
+                    `${hours}h ${minutes}m ${seconds}s`;
+            };
+            
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
+        function openNewTab() {
+            window.open(window.location.href, '_blank');
+        }
+
+        function exportInbox() {
+            if (AppState.messages.length === 0) {
+                showNotification('warning', 'No Messages', 'Nothing to export');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(AppState.messages, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `tempify-inbox-${Date.now()}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('success', 'Exported', 'Inbox exported successfully');
+        }
+
+        function toggleAutoRefresh() {
+            AppState.isAutoRefreshEnabled = !AppState.isAutoRefreshEnabled;
+            const btn = document.getElementById('autoRefreshBtn');
+            
+            if (AppState.isAutoRefreshEnabled) {
+                btn.innerHTML = '<i class="fas fa-clock"></i> Auto Refresh: ON';
+                btn.style.background = 'var(--success-bg)';
+                startAutoRefresh();
+            } else {
+                btn.innerHTML = '<i class="fas fa-clock"></i> Auto Refresh: OFF';
+                btn.style.background = '';
+                stopAutoRefresh();
+            }
+        }
+
+        function startAutoRefresh() {
+            if (AppState.autoRefreshInterval) {
+                clearInterval(AppState.autoRefreshInterval);
+            }
+            
+            AppState.autoRefreshInterval = setInterval(() => {
+                if (AppState.currentSessionId) {
+                    fetchInbox();
+                }
+            }, 10000); // Refresh every 10 seconds
+        }
+
+        function stopAutoRefresh() {
+            if (AppState.autoRefreshInterval) {
+                clearInterval(AppState.autoRefreshInterval);
+                AppState.autoRefreshInterval = null;
+            }
+        }
+
+        // =========================================================================
+        // Server Time Update
+        // =========================================================================
+        function updateServerTime() {
+            const now = new Date();
+            document.getElementById('serverTime').textContent = now.toLocaleString();
+        }
+
+        // =========================================================================
+        // Storage Management
+        // =========================================================================
+        class StorageManager {
+            static saveState() {
+                try {
+                    const state = {
+                        currentEmail: AppState.currentEmail,
+                        currentSessionId: AppState.currentSessionId,
+                        expiresAt: AppState.expiresAt,
+                        totalEmailsGenerated: AppState.totalEmailsGenerated
+                    };
+                    localStorage.setItem('tempifyState', JSON.stringify(state));
+                } catch (error) {
+                    console.error('Failed to save state:', error);
+                }
+            }
+            
+            static loadState() {
+                try {
+                    const saved = localStorage.getItem('tempifyState');
+                    if (saved) {
+                        const state = JSON.parse(saved);
+                        AppState.currentEmail = state.currentEmail;
+                        AppState.currentSessionId = state.currentSessionId;
+                        AppState.expiresAt = state.expiresAt;
+                        AppState.totalEmailsGenerated = state.totalEmailsGenerated || 0;
+                        
+                        if (AppState.currentEmail) {
+                            updateEmailDisplay();
+                            updateSessionInfo();
+                            enableInboxFeatures();
+                            fetchInbox();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load state:', error);
+                }
+            }
+        }
+
+        // =========================================================================
+        // Keyboard Shortcuts
+        // =========================================================================
+        class KeyboardShortcuts {
+            static init() {
+                document.addEventListener('keydown', (e) => {
+                    // Ctrl/Cmd + G: Generate new email
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
+                        e.preventDefault();
+                        generateNewEmail();
+                    }
+                    
+                    // Ctrl/Cmd + R: Refresh inbox
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                        e.preventDefault();
+                        if (AppState.currentSessionId) {
+                            fetchInbox();
+                        }
+                    }
+                    
+                    // Ctrl/Cmd + Shift + C: Copy email
+                    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+                        e.preventDefault();
+                        copyEmail();
+                    }
+                    
+                    // / : Focus search
+                    if (e.key === '/' && !e.ctrlKey && !e.m =========================================================================
+        // Keyboard Shortcuts
+        // =========================================================================
+        class KeyboardShortcuts {
+            static init() {
+                document.addEventListener('keydown', (e) => {
+                    // Ctrl/Cmd + G: Generate new email
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
+                        e.preventDefault();
+                        generateNewEmail();
+                    }
+                    
+                    // Ctrl/Cmd + R: Refresh inbox
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                        e.preventDefault();
+                        if (AppState.currentSessionId) {
+                            fetchInbox();
+                        }
+                    }
+                    
+                    // Ctrl/Cmd + Shift + C: Copy email
+                    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+                        e.preventDefault();
+                        copyEmail();
+                    }
+                    
+                    // / : Focus search
+                    if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+                        e.preventDefault();
+                        document.getElementById('searchInput').focus();
+                    }
+                    
+                    // Escape: Close modal
+                    if (e.key === 'Escape') {
+                        closeModal();
+                    }
+                });
+            }
+        }
+
+        // =========================================================================
+        // InitialetaKey && !e.shiftKey) {
+                        e.preventDefault();
+                        document.getElementById('searchInput').focus();
+                    }
+                    
+                    // Escape: Close modal
+                    if (e.key === 'Escape') {
+                        closeModal();
+                    }
+                });
+            }
+        }
+
+        // =========================================================================
+        // Initialization
+        // =========================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Tempify initialized - Updated for API response format');
+            
+            // Update server time every second
+            setInterval(updateServerTime, 1000);
+            
+            // Add click outside to close modal
+            window.addEventListener('click', (e) => {
+                const modal = document.getElementById('messageization
+        // =========================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Tempify initialized - Updated for API response format');
+            
+            // Update server time every second
+            setInterval(updateServerTime, 1000);
+            
+            // Add click outside to close modal
+            window.addEventListener('click', (e) => {
+                const modal = document.getElementById('messageModal');
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Initialize keyboardModal');
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Initialize keyboard shortcuts
+            KeyboardShortcuts.init();
+            
+            // Load saved state
+            setTimeout(() => {
+                StorageManager.loadState();
+            }, 100);
+            
+            // Auto-save state periodically
+            setInterval(() => {
+                StorageManager.saveState();
+            }, shortcuts
+            KeyboardShortcuts.init();
+            
+            // Load saved state
+            setTimeout(() => {
+                StorageManager.loadState();
+            }, 100);
+            
+            // Auto-save state periodically
+            setInterval(() => {
+                StorageManager.saveState();
+            }, 30000);
+            
+            30000);
+            
+            showNotification showNotification('info', 'Welcome to Tempify!', 'Generate an email to get started');
+        });
+
+('info', 'Welcome to Tempify!', 'Generate an email to get started');
+        });
+
+        // =========================================================================
+        // Cleanup on page unload
+        // =========================================================================
+        window.addEventListener('beforeunload', () => {
+            stopAutoRefresh();
+        });
+
+        // =========================================================================
+        // Error Handling
+        // =========================================================================
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            showNotification('error', 'Error', 'An unexpected error occurred');
+        });
+
+        // =========================================================================
+        // End of Application Code
+        // =========================================================================
+        console.log('Tempify fully loaded with API response fixes');
+    </script>
+</body>
+</html>

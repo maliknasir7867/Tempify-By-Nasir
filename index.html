@@ -1972,48 +1972,7 @@
                     }
                     
                     // / : Focus search
-                    if (e.key === '/' && !e.ctrlKey && !e.m =========================================================================
-        // Keyboard Shortcuts
-        // =========================================================================
-        class KeyboardShortcuts {
-            static init() {
-                document.addEventListener('keydown', (e) => {
-                    // Ctrl/Cmd + G: Generate new email
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
-                        e.preventDefault();
-                        generateNewEmail();
-                    }
-                    
-                    // Ctrl/Cmd + R: Refresh inbox
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
-                        e.preventDefault();
-                        if (AppState.currentSessionId) {
-                            fetchInbox();
-                        }
-                    }
-                    
-                    // Ctrl/Cmd + Shift + C: Copy email
-                    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
-                        e.preventDefault();
-                        copyEmail();
-                    }
-                    
-                    // / : Focus search
                     if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
-                        e.preventDefault();
-                        document.getElementById('searchInput').focus();
-                    }
-                    
-                    // Escape: Close modal
-                    if (e.key === 'Escape') {
-                        closeModal();
-                    }
-                });
-            }
-        }
-
-        // =========================================================================
-        // InitialetaKey && !e.shiftKey) {
                         e.preventDefault();
                         document.getElementById('searchInput').focus();
                     }
@@ -2037,23 +1996,7 @@
             
             // Add click outside to close modal
             window.addEventListener('click', (e) => {
-                const modal = document.getElementById('messageization
-        // =========================================================================
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Tempify initialized - Updated for API response format');
-            
-            // Update server time every second
-            setInterval(updateServerTime, 1000);
-            
-            // Add click outside to close modal
-            window.addEventListener('click', (e) => {
                 const modal = document.getElementById('messageModal');
-                if (e.target === modal) {
-                    closeModal();
-                }
-            });
-            
-            // Initialize keyboardModal');
                 if (e.target === modal) {
                     closeModal();
                 }
@@ -2070,25 +2013,9 @@
             // Auto-save state periodically
             setInterval(() => {
                 StorageManager.saveState();
-            }, shortcuts
-            KeyboardShortcuts.init();
-            
-            // Load saved state
-            setTimeout(() => {
-                StorageManager.loadState();
-            }, 100);
-            
-            // Auto-save state periodically
-            setInterval(() => {
-                StorageManager.saveState();
             }, 30000);
             
-            30000);
-            
-            showNotification showNotification('info', 'Welcome to Tempify!', 'Generate an email to get started');
-        });
-
-('info', 'Welcome to Tempify!', 'Generate an email to get started');
+            showNotification('info', 'Welcome to Tempify!', 'Generate an email to get started');
         });
 
         // =========================================================================
